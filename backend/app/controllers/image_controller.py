@@ -15,7 +15,7 @@ def remove_background():
 
         # Save to MongoDB
         ImageModel.insert_image({
-            "original_image": input_image.decode("utf-8"),
+            "original_image": input_image,  # Store as binary or encode appropriately
             "foreground_image": processed_data["foreground_image"],
             "background_image": processed_data["background_image"]
         })

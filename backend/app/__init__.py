@@ -4,8 +4,8 @@ from flask_pymongo import PyMongo
 
 mongo = PyMongo()
 
-def create_app(config_class="config.Config"):
-    app = Flask(__name__)
+def create_app(config_class="app.config.Config"):
+    app = Flask(__name__)  # Pass __name__ to Flask
     app.config.from_object(config_class)
     CORS(app)
     mongo.init_app(app)
