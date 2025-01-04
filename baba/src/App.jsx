@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import ImageConcatenator from "./components/ImageConcatenator";
+import AddTextBehindObject from "./components/AddTextBehindObject";
 
 const App = () => {
   const [image, setImage] = useState(null);
@@ -132,6 +133,7 @@ const App = () => {
       </div>
 
       <ImageConcatenator />
+      <AddTextBehindObject />
     </>
   );
 };
