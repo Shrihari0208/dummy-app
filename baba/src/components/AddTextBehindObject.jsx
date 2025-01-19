@@ -37,7 +37,7 @@ const AddTextBehindObject = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/add-text-behind",
+        "http://localhost:5000/process-image",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -45,7 +45,7 @@ const AddTextBehindObject = () => {
       );
 
       // Decode Base64 response and create a preview URL
-      const base64Image = response.data.final_image;
+      const base64Image = response.data.image; // Fix the response key
       const imageUrl = `data:image/png;base64,${base64Image}`;
       setPreviewUrl(imageUrl);
     } catch (error) {
@@ -64,6 +64,7 @@ const AddTextBehindObject = () => {
         onSubmit={handleSubmit}
         className="flex flex-col items-center space-y-4"
       >
+        {/* Upload Image */}
         <div className="w-full max-w-md">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Upload Image
@@ -76,6 +77,7 @@ const AddTextBehindObject = () => {
           />
         </div>
 
+        {/* Enter Text */}
         <div className="w-full max-w-md">
           <label className="block text-sm font-medium text-black mb-1">
             Enter Text
@@ -89,6 +91,7 @@ const AddTextBehindObject = () => {
           />
         </div>
 
+        {/* Font Size */}
         <div className="w-full max-w-md">
           <label className="block text-sm font-medium text-black mb-1">
             Font Size ({fontSize}px)
@@ -103,6 +106,7 @@ const AddTextBehindObject = () => {
           />
         </div>
 
+        {/* Text Color */}
         <div className="w-full max-w-md">
           <label className="block text-sm font-medium text-black mb-1">
             Text Color
@@ -115,6 +119,7 @@ const AddTextBehindObject = () => {
           />
         </div>
 
+        {/* Text Position */}
         <div className="w-full max-w-md">
           <label className="block text-sm font-medium text-black mb-1">
             Text Position (X: {textPosition.x}%, Y: {textPosition.y}%)
@@ -149,6 +154,7 @@ const AddTextBehindObject = () => {
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
@@ -158,6 +164,7 @@ const AddTextBehindObject = () => {
         </button>
       </form>
 
+      {/* Preview Processed Image */}
       {previewUrl && (
         <div className="mt-8">
           <h2 className="text-lg font-semibold mb-4">Processed Image:</h2>
