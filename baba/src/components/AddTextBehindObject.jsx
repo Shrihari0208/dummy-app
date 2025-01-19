@@ -4,6 +4,9 @@ import axios from "axios";
 const AddTextBehindObject = () => {
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
+  const [fontSize, setFontSize] = useState(40);
+  const [textColor, setTextColor] = useState("#000000");
+  const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,6 +30,10 @@ const AddTextBehindObject = () => {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("text", text);
+    formData.append("font_size", fontSize);
+    formData.append("text_color", textColor);
+    formData.append("x_position", textPosition.x);
+    formData.append("y_position", textPosition.y);
 
     try {
       const response = await axios.post(
@@ -78,8 +85,68 @@ const AddTextBehindObject = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter text to add behind object"
-            className="w-full px-4 py-2 border text-5xl text-red-700 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+        </div>
+
+        <div className="w-full max-w-md">
+          <label className="block text-sm font-medium text-black mb-1">
+            Font Size ({fontSize}px)
+          </label>
+          <input
+            type="range"
+            min="10"
+            max="100"
+            value={fontSize}
+            onChange={(e) => setFontSize(parseInt(e.target.value))}
+            className="w-full"
+          />
+        </div>
+
+        <div className="w-full max-w-md">
+          <label className="block text-sm font-medium text-black mb-1">
+            Text Color
+          </label>
+          <input
+            type="color"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
+        <div className="w-full max-w-md">
+          <label className="block text-sm font-medium text-black mb-1">
+            Text Position (X: {textPosition.x}%, Y: {textPosition.y}%)
+          </label>
+          <div className="flex space-x-4">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={textPosition.x}
+              onChange={(e) =>
+                setTextPosition({
+                  ...textPosition,
+                  x: parseInt(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={textPosition.y}
+              onChange={(e) =>
+                setTextPosition({
+                  ...textPosition,
+                  y: parseInt(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+          </div>
         </div>
 
         <button

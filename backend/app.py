@@ -83,62 +83,45 @@ def add_text_behind():
 
     image_file = request.files['image']
     user_text = request.form['text']
+    font_size = int(request.form.get('font_size', 40))
+    text_color = request.form.get('text_color', "#000000")
+    x_position = int(request.form.get('x_position', 50))
+    y_position = int(request.form.get('y_position', 50))
 
     try:
-        # Validate and open the image
+        image = Image.open(image_file).convert("RGBA")
+        foreground = remove(image)
+        mask = foreground.split()[-1]
+
+        text_background = Image.new("RGBA", image.size, (255, 255, 255, 255))
+        draw = ImageDraw.Draw(text_background)
+
         try:
-            image = Image.open(image_file).convert("RGBA")
-        except Exception as e:
-            return jsonify({'error': f'Invalid image file. Error: {str(e)}'}), 400
+            font = ImageFont.truetype("arial.ttf", size=font_size)
+        except Exception:
+            font = ImageFont.load_default()
 
-        # Remove the background to get the subject (foreground)
-        try:
-            foreground = remove(image)  # Subject with a transparent background
-            mask = foreground.split()[-1]  # Alpha channel as a mask
-        except Exception as e:
-            return jsonify({'error': f'Background removal failed. Error: {str(e)}'}), 500
+        text_bbox = draw.textbbox((0, 0), user_text, font=font)
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
 
-        # Generate the text background
-        try:
-            text_background = Image.new("RGBA", image.size, (255, 255, 255, 255))  # White background
-            draw = ImageDraw.Draw(text_background)
+        text_position = (
+            int(image.size[0] * x_position / 100 - text_width / 2),
+            int(image.size[1] * y_position / 100 - text_height / 2),
+        )
 
-            # Load a font
-            try:
-                font = ImageFont.truetype("arial.ttf", size=40)  # Adjust size as needed
-            except Exception:
-                font = ImageFont.load_default()  # Use default font if TTF font is unavailable
+        draw.text(text_position, user_text, fill=text_color, font=font)
+        combined_image = Image.composite(foreground, text_background, mask)
 
-            # Calculate text size using textbbox
-            text_bbox = draw.textbbox((0, 0), user_text, font=font)  # Get text bounding box
-            text_width = text_bbox[2] - text_bbox[0]
-            text_height = text_bbox[3] - text_bbox[1]
-
-            # Center the text on the background
-            text_position = ((image.size[0] - text_width) // 2, (image.size[1] - text_height) // 2)
-
-            # Add the text to the background
-            draw.text(text_position, user_text, fill="black", font=font)
-        except Exception as e:
-            return jsonify({'error': f'Text generation failed. Error: {str(e)}'}), 500
-
-        # Combine text background with isolated object
-        try:
-            combined_image = Image.composite(foreground, text_background, mask)  # Overlay foreground on text background
-        except Exception as e:
-            return jsonify({'error': f'Failed to combine text and object. Error: {str(e)}'}), 500
-
-        # Convert the final image to Base64
         final_buffer = io.BytesIO()
         combined_image.save(final_buffer, format="PNG")
         final_base64 = base64.b64encode(final_buffer.getvalue()).decode('utf-8')
 
-        return jsonify({
-            'final_image': final_base64  # Combined image with text behind the isolated object
-        }), 200
+        return jsonify({'final_image': final_base64}), 200
 
     except Exception as e:
         return jsonify({'error': f'Failed to process the image. Error: {str(e)}'}), 500
+
 
 
 if __name__ == '__main__':
